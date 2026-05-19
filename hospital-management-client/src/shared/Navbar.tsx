@@ -46,6 +46,8 @@ export default function Navbar() {
       navLinks.push({ name: "Doctor Dashboard", href: "/doctor/dashboard" });
     } else if (userRole === "Admin") {
       navLinks.push({ name: "Admin Dashboard", href: "/admin/dashboard" });
+      navLinks.push({ name: "Schedules & Records", href: "/admin/records-schedules" });
+      navLinks.push({ name: "Manage Users", href: "/admin/users" });
     } else if (userRole === "Patient") {
       navLinks.push({ name: "Patient Dashboard", href: "/patient/dashboard" });
       navLinks.push({ name: "Medical History", href: "/patient/medical-history" });
