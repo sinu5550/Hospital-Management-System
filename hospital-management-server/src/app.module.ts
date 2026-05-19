@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentsModule } from './departments/departments.module.js';
 import { AppointmentsModule } from './appointments/appointments.module';
+import { PatientsModule } from './patients/patients.module';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -26,6 +27,7 @@ dotenv.config();
     AuthModule,
     DepartmentsModule,
     AppointmentsModule,
+    PatientsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
