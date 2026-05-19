@@ -9,14 +9,13 @@ import { Roles } from '../auth/decorators/roles.decorator.js';
 import { UserRole } from 'src/common/enums/role.enum';
 
 @ApiTags('Departments')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('departments')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
   @Post()
-  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new clinical department (Admin only)' })
   @ApiResponse({ status: 201, description: 'Department successfully created.' })
@@ -31,7 +30,6 @@ export class DepartmentsController {
   @Get()
   @ApiOperation({ summary: 'List all clinical departments' })
   @ApiResponse({ status: 200, description: 'List of departments fetched.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async findAll() {
     return this.departmentsService.findAll();
   }
@@ -39,14 +37,14 @@ export class DepartmentsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get details of a specific clinical department' })
   @ApiResponse({ status: 200, description: 'Department details fetched.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 404, description: 'Department not found.' })
   async findOne(@Param('id') id: string) {
     return this.departmentsService.findOne(id);
   }
 
   @Patch(':id')
-  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update clinical department details (Admin only)' })
   @ApiResponse({ status: 200, description: 'Department successfully updated.' })
@@ -59,7 +57,8 @@ export class DepartmentsController {
   }
 
   @Delete(':id')
-  @UseGuards(RolesGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete a clinical department (Admin only)' })
   @ApiResponse({ status: 200, description: 'Department successfully deleted.' })
