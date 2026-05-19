@@ -23,8 +23,6 @@ export default function Navbar() {
           setUserRole(res.data.role);
         })
         .catch((err) => {
-          console.error("Session verification failed:", err);
-          // If token is invalid or expired, clear it
           window.localStorage.removeItem("token");
           setIsLoggedIn(false);
           setUserRole(null);
@@ -50,6 +48,7 @@ export default function Navbar() {
       navLinks.push({ name: "Admin Dashboard", href: "/admin/dashboard" });
     } else if (userRole === "Patient") {
       navLinks.push({ name: "Patient Dashboard", href: "/patient/dashboard" });
+      navLinks.push({ name: "Medical History", href: "/patient/medical-history" });
     }
   }
 
