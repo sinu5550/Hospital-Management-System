@@ -45,4 +45,51 @@ export class AppointmentsService {
 
     return await this.appointmentRepository.save(appointment);
   }
+
+  public async findMyAppointments(userId: string, role: UserRole): Promise<Appointment[]> {
+    let appointments: Appointment[] = [];
+
+    if (role === UserRole.PATIENT) {
+      appointments = await this.appointmentRepository.find({
+        where: { patientId: userId },
+        relations: { doctor: true },
+        order: { appointmentDate: 'ASC' },
+      });
+      appointments.forEach(app => {
+        if (app.doctor) {
+          const { password, ...doctorWithoutPassword } = app.doctor;
+          app.doctor = doctorWithoutPassword as any;
+        }
+      });
+    } else if (role === UserRole.DOCTOR) {
+      appointments = await this.appointmentRepository.find({
+        where: { doctorId: userId },
+        relations: { patient: true },
+        order: { appointmentDate: 'ASC' },
+      });
+      appointments.forEach(app => {
+        if (app.patient) {
+          const { password, ...patientWithoutPassword } = app.patient;
+          app.patient = patientWithoutPassword as any;
+        }
+      });
+    } else {
+      appointments = await this.appointmentRepository.find({
+        relations: { patient: true, doctor: true },
+        order: { appointmentDate: 'ASC' },
+      });
+      appointments.forEach(app => {
+        if (app.patient) {
+          const { password, ...patientWithoutPassword } = app.patient;
+          app.patient = patientWithoutPassword as any;
+        }
+        if (app.doctor) {
+          const { password, ...doctorWithoutPassword } = app.doctor;
+          app.doctor = doctorWithoutPassword as any;
+        }
+      });
+    }
+
+    return appointments;
+  }
 }
