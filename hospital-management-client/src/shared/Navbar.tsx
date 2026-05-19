@@ -85,12 +85,22 @@ export default function Navbar() {
           </div>
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
-              <button
-                onClick={handleLogout}
-                className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-red-500 transition-all duration-200 active:scale-95 cursor-pointer"
-              >
-                Log Out
-              </button>
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/profile"
+                  className={`text-sm font-semibold transition-colors duration-200 hover:text-emerald-500 ${
+                    pathname === "/profile" ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-700 dark:text-zinc-300"
+                  }`}
+                >
+                  👤 Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-red-500 transition-all duration-200 active:scale-95 cursor-pointer"
+                >
+                  Log Out
+                </button>
+              </div>
             ) : (
               <>
                 <Link
