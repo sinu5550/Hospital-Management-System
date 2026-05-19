@@ -5,6 +5,9 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentsModule } from './departments/departments.module.js';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Module({
   imports: [
@@ -12,8 +15,8 @@ import { DepartmentsModule } from './departments/departments.module.js';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'postgres',
-      password: 'siyan',
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
       database: 'hmsDB',
       autoLoadEntities: true,
       synchronize: true,
