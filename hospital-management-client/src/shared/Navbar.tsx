@@ -2,26 +2,58 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     const token = window.localStorage.getItem("token");
     setIsLoggedIn(!!token);
+
+    if (token) {
+      axios
+        .get("http://localhost:3000/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          setUserRole(res.data.role);
+        })
+        .catch((err) => {
+          console.error("Session verification failed:", err);
+          // If token is invalid or expired, clear it
+          window.localStorage.removeItem("token");
+          setIsLoggedIn(false);
+          setUserRole(null);
+        });
+    } else {
+      setUserRole(null);
+    }
   }, [pathname]);
 
   const handleLogout = () => {
     window.localStorage.removeItem("token");
     setIsLoggedIn(false);
+    setUserRole(null);
     router.push("/login");
   };
 
-  const navLinks = [
-    { name: "Departments", href: "/departments" },
-  ];
+  const navLinks = [];
+
+  if (isLoggedIn && userRole) {
+    if (userRole === "Doctor") {
+      navLinks.push({ name: "Doctor Dashboard", href: "/doctor/dashboard" });
+    } else if (userRole === "Admin") {
+      navLinks.push({ name: "Admin Dashboard", href: "/admin/dashboard" });
+    } else if (userRole === "Patient") {
+      navLinks.push({ name: "Patient Dashboard", href: "/patient/dashboard" });
+    }
+  }
+
+  navLinks.push({ name: "Departments", href: "/departments" });
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-zinc-200/50 bg-white/80 backdrop-blur-md dark:border-zinc-800/50 dark:bg-zinc-950/80 transition-all duration-300">
