@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -25,5 +25,19 @@ export class AppointmentsController {
   public async create(@Req() req: any, @Body() createAppointmentDto: CreateAppointmentDto) {
     const patientId = req.user.id;
     return this.appointmentsService.create(patientId, createAppointmentDto);
+  }
+
+  @Get('my')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.PATIENT, UserRole.DOCTOR, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get dynamic schedules based on logged in user role (Patient/Doctor/Admin)' })
+  @ApiResponse({ status: 200, description: 'Successfully fetched dynamic appointments calendar.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Patient/Doctor/Admin role required).' })
+  public async findMy(@Req() req: any) {
+    const userId = req.user.id;
+    const role = req.user.role;
+    return this.appointmentsService.findMyAppointments(userId, role);
   }
 }
