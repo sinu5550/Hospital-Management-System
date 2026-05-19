@@ -153,7 +153,10 @@ export default function AdminDashboard() {
             <span className="text-emerald-600 dark:text-emerald-400 font-bold">&rarr;</span>
           </Link>
 
-          <div className="flex items-center justify-between rounded-lg border border-zinc-200 p-4 opacity-60 dark:border-zinc-800">
+          <Link
+            href="/admin/records-schedules"
+            className="flex items-center justify-between rounded-lg border border-zinc-200 p-4 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50 transition-colors"
+          >
             <div>
               <span className="font-semibold text-zinc-900 dark:text-white block">
                 Medical Records & Schedules
@@ -162,8 +165,8 @@ export default function AdminDashboard() {
                 View appointments and patient history channels
               </span>
             </div>
-            <span className="text-zinc-400 font-bold">&rarr;</span>
-          </div>
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold">&rarr;</span>
+          </Link>
         </div>
       </div>
     </div>
