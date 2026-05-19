@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
+import { UserRole } from 'src/common/enums/role.enum';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -21,5 +23,12 @@ export class UsersService {
 
   async findOneById(id: string): Promise<User | null> {
     return this.userRepository.findOne({ where: { id } });
+  }
+
+  async findAllDoctors(): Promise<User[]> {
+    return this.userRepository.find({
+      where: { role: UserRole.DOCTOR },
+      select: ['id', 'fullName', 'email', 'departmentId', 'createdAt'],
+    });
   }
 }
