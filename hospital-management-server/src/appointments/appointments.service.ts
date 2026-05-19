@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Appointment } from './entities/appointment.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { UpdateReportDto } from './dto/update-report.dto';
 import { UsersService } from '../users/users.service';
 import { UserRole } from '../common/enums/role.enum';
 import { AppointmentStatus } from '../common/enums/appointment-status.enum';
@@ -89,6 +90,49 @@ export class AppointmentsService {
         }
       });
     }
+
+    return appointments;
+  }
+
+  public async updateReport(appointmentId: string, doctorId: string, updateReportDto: UpdateReportDto): Promise<Appointment> {
+    const appointment = await this.appointmentRepository.findOne({ where: { id: appointmentId } });
+    if (!appointment) {
+      throw new NotFoundException(`Appointment with ID ${appointmentId} not found.`);
+    }
+
+    if (appointment.doctorId !== doctorId) {
+      throw new BadRequestException('You are not authorized to update reports for other doctors\' appointments.');
+    }
+
+    appointment.diagnosis = updateReportDto.diagnosis;
+    appointment.prescription = updateReportDto.prescription;
+    appointment.status = AppointmentStatus.COMPLETED;
+
+    return await this.appointmentRepository.save(appointment);
+  }
+
+  public async getPatientMedicalHistory(patientId: string): Promise<Appointment[]> {
+    const patientUser = await this.usersService.findOneById(patientId);
+    if (!patientUser) {
+      throw new NotFoundException(`Patient with ID ${patientId} not found.`);
+    }
+
+    if (patientUser.role !== UserRole.PATIENT) {
+      throw new BadRequestException(`User with ID ${patientId} is not a Patient.`);
+    }
+
+    const appointments = await this.appointmentRepository.find({
+      where: { patientId },
+      relations: { doctor: true },
+      order: { appointmentDate: 'DESC' },
+    });
+
+    appointments.forEach(app => {
+      if (app.doctor) {
+        const { password, ...doctorWithoutPassword } = app.doctor;
+        app.doctor = doctorWithoutPassword as any;
+      }
+    });
 
     return appointments;
   }

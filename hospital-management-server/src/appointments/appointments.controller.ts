@@ -1,7 +1,8 @@
-import { Controller, Post, Get, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Param, Body, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { UpdateReportDto } from './dto/update-report.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -39,5 +40,24 @@ export class AppointmentsController {
     const userId = req.user.id;
     const role = req.user.role;
     return this.appointmentsService.findMyAppointments(userId, role);
+  }
+
+  @Patch(':id/report')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.DOCTOR)
+  @ApiOperation({ summary: 'Update consultation report with diagnosis and prescription (Doctor only)' })
+  @ApiResponse({ status: 200, description: 'Appointment report successfully updated and completed.' })
+  @ApiResponse({ status: 400, description: 'Invalid input data or unauthorized access.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Doctor role required).' })
+  @ApiResponse({ status: 404, description: 'Appointment not found.' })
+  public async updateReport(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() updateReportDto: UpdateReportDto,
+  ) {
+    const doctorId = req.user.id;
+    return this.appointmentsService.updateReport(id, doctorId, updateReportDto);
   }
 }
