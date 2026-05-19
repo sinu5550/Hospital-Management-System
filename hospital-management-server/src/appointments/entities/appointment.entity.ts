@@ -29,11 +29,11 @@ export class Appointment {
   @Column({ type: 'uuid' })
   doctorId: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'patientId' })
   patient: User;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'doctorId' })
   doctor: User;
 
